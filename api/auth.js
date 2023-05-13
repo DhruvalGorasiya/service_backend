@@ -14,35 +14,35 @@ app.post("/sign_up", async (req, res) => {
   if (!req.body.userName) {
     res.status(406).json({
       success: false,
-      message: "UserName is Required",
+      message: "userName is Required",
     });
   } else if (!req.body.email) {
     res.status(406).json({
       success: false,
-      message: "Email is Required",
+      message: "email is Required",
     });
   } else if (!req.body.password) {
     res.status(406).json({
       success: false,
-      message: "Password is Required",
+      message: "password is Required",
     });
   } else if (!req.body.phone) {
     res.status(406).json({
       success: false,
-      message: "Phone is Required",
+      message: "phone is Required",
     });
-  }else if (!req.body.userType) {
+  } else if (!req.body.userType) {
     res.status(406).json({
       success: false,
-      message: "UserType is Required",
+      message: "userType is Required",
     });
-  } else if(req.body.userType !== "service_provider" && req.body.userType !== "user"){
+  } else if (req.body.userType !== "service_provider" && req.body.userType !== "user") {
 
     res.status(406).json({
       success: false,
       message: "Please enter a valid userType",
     });
-  }else {
+  } else {
     var userModel = new UserModel({
       userName: req.body.userName,
       email: req.body.email,
@@ -67,6 +67,7 @@ app.post("/sign_up", async (req, res) => {
           {
             email: req.body.email,
             id: data.id,
+            userType: data.userType
           },
           JWT_SECRET,
           {
@@ -86,7 +87,6 @@ app.post("/sign_up", async (req, res) => {
             token: token,
           },
         });
-
         // await OtpModel.updateOne(
         //   { email: req.body.email },
         //   { email: req.body.email, otp: bcrypt.hashSync(otp.toString(), 10) },
@@ -122,7 +122,6 @@ app.post("/sign_up", async (req, res) => {
         //   });
       })
       .catch((fail) => {
-        console.log(fail);
         if (fail) {
           if (fail.name === "MongoServerError" && fail.code === 11000) {
             if (fail.keyValue.email) {
@@ -150,6 +149,9 @@ app.post("/sign_up", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+
+  // re.
+
   var { email, password } = req.body;
   if (!email || !password) {
     res.status(406).send({ message: "Please enter all fields" });
@@ -179,13 +181,13 @@ app.post("/login", async (req, res) => {
                 {
                   email: req.body.email,
                   id: data[0].id,
+                  userType: data[0].userType
                 },
                 JWT_SECRET,
                 {
                   expiresIn: "24h",
                 }
               );
-
               res.status(200).send({
                 status: true,
                 message: "User login successfully",
@@ -193,6 +195,7 @@ app.post("/login", async (req, res) => {
                   id: data[0].id,
                   email: data[0].email,
                   phone: data[0].phone,
+                  userName: data[0].userName,
                   userType: data[0].userType,
                   token: token,
                 },
